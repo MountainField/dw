@@ -1,8 +1,6 @@
-# Develper Guide for Maximo Visual Inspection (MVI) Validator
+# Develper Guide for Data Wrangler
 
 
-
-[MVI Validator](https://github.ibm.com/sustainability-software-japan/mvi-validator) is an accuracy validator for Maximo Visual Inspection.
 
 
 
@@ -54,10 +52,6 @@ $ rm -rf dist && python3 -m build
 
 
 
-## Contributing
-
-Open Issue [here](https://github.ibm.com/sustainability-software-japan/mvi-validator/issues) .
-
 
 
 ## Authors
@@ -66,7 +60,7 @@ Open Issue [here](https://github.ibm.com/sustainability-software-japan/mvi-valid
 
 Takahide Nogayama
 
-<a href="https://github.ibm.com/NOGAYAMA"><img src="https://avatars.github.ibm.com/u/17184?s=460" width="100"/></a>
+<a href="https://github.com/nogayama"><img src="https://avatars.githubusercontent.com/u/11750755" width="100"/></a>
 
 
 
