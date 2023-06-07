@@ -125,18 +125,21 @@ with description("dw.dsl.IterableMonad"):
 with description("dw.dsl.FlippableIterableMonadicFunction"):
 
     ################################
-    # Specs for v0.3.0
-    with description("#__call__"):
+    # Specs for v0.3.0 -v0.4.0
+    for k, do_nothing_mf in {"flippable class based": do_nothing_monadic_func_flippable_class_based,\
+                              "decorator based": do_nothing_monadic_func_by_decorator}.items():
+        with context(f"{k} monadic function"):
+            with description("#__call__"):
 
-        @it("returns a new IterableMonad")
-        def _(self):
-            assert_that((IterableMonad(["a", "b"]) | do_nothing_monadic_func_flippable_class_based) > [], equal_to(["a", "b"]))
+                @it("returns a new IterableMonad")
+                def _(self):
+                    assert_that((IterableMonad(["a", "b"]) | do_nothing_mf) > [], equal_to(["a", "b"]))
 
-    with description("#__ror__"):
+            with description("#__ror__"):
 
-        @it("wraps the left iterable, apply the monadic function, and returns a new IterableMonad")
-        def _(self):
-            assert_that((["a", "b"] | do_nothing_monadic_func_flippable_class_based) > [], equal_to(["a", "b"]))
+                @it("wraps the left iterable, apply the monadic function, and returns a new IterableMonad")
+                def _(self):
+                    assert_that((["a", "b"] | do_nothing_mf) > [], equal_to(["a", "b"]))
 
 
 if __name__ == '__main__':
