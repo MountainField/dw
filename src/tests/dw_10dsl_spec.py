@@ -26,6 +26,14 @@ def DO_NOTHING_MF(iterable: _Iterable) -> IterableMonad:
 with description("dw.dsl.IterableMonad"):
 
     ################################
+    # Specs from v0.0.0
+    with description("#__iter__"):
+
+        @it("behaves like Iterable")
+        def _(self):
+            assert_that(list(IterableMonad(["a", "b"])), equal_to(["a", "b"]))
+
+    ################################
     # Specs from v0.1.0
     with description("#bind"):
 
@@ -43,11 +51,19 @@ with description("dw.dsl.IterableMonad"):
             m2 = m | DO_NOTHING_MF
             assert_that(m2.iterable, equal_to(DATA))
 
-    with description("#__iter__"):
+    ################################
+    # Specs from v0.2.0
+    with description("#redirect_to"):
 
-        @it("behaves like Iterable")
+        @it("puts recoreds into sink")
         def _(self):
-            assert_that(list(IterableMonad(["a", "b"])), equal_to(["a", "b"]))
+            assert_that(IterableMonad(["a", "b"]).redirect_to([]), equal_to(["a", "b"]))
+
+    with description("#__gt__"):
+
+        @it("puts recoreds into sink")
+        def _(self):
+            assert_that(IterableMonad(["a", "b"]) > [], equal_to(["a", "b"]))
 
 
 if __name__ == '__main__':

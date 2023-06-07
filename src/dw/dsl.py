@@ -15,6 +15,8 @@ from __future__ import annotations as _annotations
 from collections.abc import Iterable as _Iterable
 from collections.abc import Iterator as _Iterator
 from collections.abc import Callable as _Callable
+from collections.abc import Sequence as _Sequence
+
 import io as _io
 import logging as _logging
 
@@ -56,3 +58,29 @@ class IterableMonad(object):
         return sio.getvalue()
 
     __repr__ = __str__
+
+    ################################################
+    # implements redirection
+    def redirect_to(self, sink) -> object:
+        _LOGGER.debug("Redirecting from %s to %s", self.name, type(sink).__name__)
+        other = self.bind(tee(sink))
+        # consume
+        for _ in other:
+            pass
+        return sink
+
+    __gt__ = redirect_to  # range(5) | sort() > []
+
+
+def tee(sink: object) -> _Callable:
+
+    def monadic_func(iterable: _Iterable) -> _Iterable[object]:
+
+        if isinstance(sink, _Sequence):
+            for obj in iterable:
+                sink.append(obj)
+                yield obj
+        else:
+            raise ValueError(f"sink=={sink} is not instance of either io, Sequence, or Set")
+
+    return monadic_func

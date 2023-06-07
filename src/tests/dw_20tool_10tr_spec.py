@@ -18,12 +18,9 @@ from dw.tool.tr import *
 
 with description("dw.tool.tr.tr"):
 
-    ################################
-    # Specs from v0.1.0
     @it("replaces a single character ")
     def _(self):
-        mf = IterableMonad(["abc", "xaz"]) | tr("a", "A")
-        assert_that(list(mf), equal_to(["Abc", "xAz"]))
+        assert_that(list(IterableMonad(["abc", "xaz"]) | tr("a", "A")), equal_to(["Abc", "xAz"]))
 
 
 if __name__ == '__main__':
