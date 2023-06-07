@@ -61,7 +61,7 @@ class IterableMonad(object):
 
     ################################################
     # implements redirection
-    def redirect_to(self, sink) -> object:
+    def redirect_to(self, sink: object) -> object:
         _LOGGER.debug("Redirecting from %s to %s", self.name, type(sink).__name__)
         other = self.bind(tee(sink))
         # consume
@@ -71,12 +71,24 @@ class IterableMonad(object):
 
     __gt__ = redirect_to  # range(5) | sort() > []
 
+    def appending_redirect_to(self, sink: object) -> object:
+        _LOGGER.info("Redirecting with append mode from %s to %s", self.name, type(sink).__name__)
+        other = self.bind(tee(sink, append=True))
+        # consume
+        for _ in other:
+            pass
+        return sink
 
-def tee(sink: object) -> _Callable:
+    __rshift__ = appending_redirect_to  # (range(5) | sort() ) >> "filename". because >> is stronger than |.
+
+
+def tee(sink: object, append: bool = False) -> _Callable:
 
     def monadic_func(iterable: _Iterable) -> _Iterable[object]:
 
         if isinstance(sink, _Sequence):
+            if not append:
+                sink.clear()
             for obj in iterable:
                 sink.append(obj)
                 yield obj

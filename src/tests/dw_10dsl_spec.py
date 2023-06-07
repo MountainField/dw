@@ -65,6 +65,18 @@ with description("dw.dsl.IterableMonad"):
         def _(self):
             assert_that(IterableMonad(["a", "b"]) > [], equal_to(["a", "b"]))
 
+    with description("#appending_redirect_to"):
+
+        @it("puts recoreds into sink with append mode")
+        def _(self):
+            assert_that(IterableMonad(["a", "b"]).appending_redirect_to(["x"]), equal_to(["x", "a", "b"]))
+
+    with description("#__rshift__"):
+
+        @it("puts recoreds into sink with append mode")
+        def _(self):
+            assert_that(IterableMonad(["a", "b"]) >> ["x"], equal_to(["x", "a", "b"]))
+
 
 if __name__ == '__main__':
     import unittest
