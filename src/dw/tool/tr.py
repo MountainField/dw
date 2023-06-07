@@ -31,7 +31,7 @@ from dw.dsl import *
 
 ################################
 # based on v0.1.0
-def tr(set1: str, set2: str) -> _Callable:
+def tr1(set1: str, set2: str) -> _Callable:
 
     def monadic_func(iterable: _Iterable[str]) -> _Iterable[str]:
         row_in: str
@@ -46,18 +46,41 @@ def tr(set1: str, set2: str) -> _Callable:
     return monadic_func
 
 
+tr = tr1
+
+
 ################################
 # based on v0.2.0
-# class _tr2(AbstractIterableMonadicFunction):
-#     def __init__(self, set1: str, set2: str):
-#         self.f = tr(set1, set2)
-#     def __call__(self, iterable: _Iterable) -> IterableMonad:
-#         return self.f(iterable)
+class _tr2(AbstractIterableMonadicFunction):
+
+    def __init__(self, set1: str, set2: str):
+        self.f = tr1(set1, set2)
+
+    def __call__(self, iterable: _Iterable) -> IterableMonad:
+        return self.f(iterable)
 
 
 ################################
 # based on v0.3.0
-class _tr2(FlippableIterableMonadicFunction):
+class _tr3(FlippableIterableMonadicFunction):
 
     def __init__(self, set1: str, set2: str):
-        super().__init__(monadic_function=tr(set1, set2))
+        super().__init__(monadic_function=tr1(set1, set2))
+
+
+################################
+# based on v0.4.0
+@pipeable
+def _tr4(set1: str, set2: str) -> _Callable:
+
+    def mf(iterable: _Iterable[str]) -> _Iterable[str]:
+        row_in: str
+        row_out: str
+        for row_in in iterable:
+            if set1 in row_in:
+                row_out = row_in.replace(set1, set2)
+            else:
+                row_out = row_in
+            yield row_out
+
+    return mf

@@ -43,6 +43,18 @@ class DoNothingMFFlippableClassBased(FlippableIterableMonadicFunction):
 
 do_nothing_monadic_func_flippable_class_based = DoNothingMFFlippableClassBased()
 
+
+@pipeable
+def do_nothing_monadic_func_by_decorator_f():
+
+    def f(iterable: _Iterable) -> IterableMonad:
+        return IterableMonad(iterable)
+
+    return f
+
+
+do_nothing_monadic_func_by_decorator = do_nothing_monadic_func_by_decorator_f()
+
 with description("dw.dsl.IterableMonad"):
 
     ################################
@@ -54,10 +66,11 @@ with description("dw.dsl.IterableMonad"):
             assert_that(list(IterableMonad(["a", "b"])), equal_to(["a", "b"]))
 
     ################################
-    # Specs for v0.1.0
+    # Specs for v0.1.0 - v0.4.0
     for k, do_nothing_mf in {"function based": do_nothing_monadic_func1, \
                              "class based": do_nothing_monadic_func_class_based, \
-                             "flippable class based": do_nothing_monadic_func_flippable_class_based}.items():
+                             "flippable class based": do_nothing_monadic_func_flippable_class_based,
+                             "decorator based": do_nothing_monadic_func_by_decorator}.items():
 
         with context(f"{k} monadic function"):
             with description("#bind"):

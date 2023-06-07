@@ -96,7 +96,7 @@ class IterableMonad(object):
 ################################################################################
 # Class that is superposition of Monad and MonadicFunction.
 # If it is called as function, it behaves like Monadic Function and returns Monad
-# If it is called as a argument of __ror__, it behaves like Monad
+# If it is called as a argument of __ror__, it wraps iterable and returns Monad
 class FlippableIterableMonadicFunction(AbstractIterableMonadicFunction):
 
     def __init__(self, monadic_function: _Callable):
@@ -107,6 +107,18 @@ class FlippableIterableMonadicFunction(AbstractIterableMonadicFunction):
 
     def __ror__(self, iterable: _Iterable) -> IterableMonad:
         return IterableMonad(iterable, name=type(iterable).__name__).bind(self._mf)
+
+
+################################################################################
+# Decorator
+
+
+def pipeable(f):
+    # return FlippableIterableMonadicFunction(f)
+    def g(*args, **kwargs):
+        return FlippableIterableMonadicFunction(f(*args, *kwargs))
+
+    return g
 
 
 ################################################################################
