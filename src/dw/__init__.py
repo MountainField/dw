@@ -22,12 +22,15 @@ import sys as _sys
 _LOGGER: _logging.Logger = _logging.getLogger(__name__)
 _LOG_FORMAT: str = '%(asctime)s |  %(levelname)-7s | %(message)s (%(filename)s L%(lineno)s %(name)s)'
 
+from . import dsl
+
 
 ################################################################################
 def main_cli(*args: list[str]) -> int:
     _logging.basicConfig(stream=_sys.stderr, format=_LOG_FORMAT, level=_logging.INFO)
     print("hello")
     return 0
+
 
 if __name__ == "__main__":
     _sys.exit(main_cli())
