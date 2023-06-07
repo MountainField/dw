@@ -56,4 +56,3 @@ class IterableMonad(object):
         return sio.getvalue()
 
     __repr__ = __str__
-

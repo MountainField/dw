@@ -25,6 +25,8 @@ def DO_NOTHING_MF(iterable: _Iterable) -> IterableMonad:
 
 with description("dw.dsl.IterableMonad"):
 
+    ################################
+    # Specs from v0.1.0
     with description("#bind"):
 
         @it("binds with new monad")
