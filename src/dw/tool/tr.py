@@ -46,10 +46,18 @@ def tr(set1: str, set2: str) -> _Callable:
     return monadic_func
 
 
-class _tr2(AbstractIterableMonadicFunction):
+################################
+# based on v0.2.0
+# class _tr2(AbstractIterableMonadicFunction):
+#     def __init__(self, set1: str, set2: str):
+#         self.f = tr(set1, set2)
+#     def __call__(self, iterable: _Iterable) -> IterableMonad:
+#         return self.f(iterable)
+
+
+################################
+# based on v0.3.0
+class _tr2(FlippableIterableMonadicFunction):
 
     def __init__(self, set1: str, set2: str):
-        self.f = tr(set1, set2)
-
-    def __call__(self, iterable: _Iterable) -> IterableMonad:
-        return self.f(iterable)
+        super().__init__(monadic_function=tr(set1, set2))

@@ -19,22 +19,34 @@ from dw.dsl import *
 DATA: list[str] = ["a", "b"]
 
 
-def DO_NOTHING_MF1(iterable: _Iterable) -> IterableMonad:
+####
+def do_nothing_monadic_func1(iterable: _Iterable) -> IterableMonad:
     return IterableMonad(iterable)
 
 
-class DoNothingMF2(AbstractIterableMonadicFunction):
+####
+class DoNothingMFClassBased(AbstractIterableMonadicFunction):
 
     def __call__(self, iterable: _Iterable) -> IterableMonad:
         return IterableMonad(iterable)
 
 
-DO_NOTHING_MF2 = DoNothingMF2()
+do_nothing_monadic_func_class_based = DoNothingMFClassBased()
+
+
+####
+class DoNothingMFFlippableClassBased(FlippableIterableMonadicFunction):
+
+    def __init__(self):
+        super().__init__(monadic_function=do_nothing_monadic_func1)
+
+
+do_nothing_monadic_func_flippable_class_based = DoNothingMFFlippableClassBased()
 
 with description("dw.dsl.IterableMonad"):
 
     ################################
-    # Specs from v0.0.0
+    # Specs for v0.0.0
     with description("#__iter__"):
 
         @it("behaves like Iterable")
@@ -42,43 +54,30 @@ with description("dw.dsl.IterableMonad"):
             assert_that(list(IterableMonad(["a", "b"])), equal_to(["a", "b"]))
 
     ################################
-    # Specs from v0.1.0
-    with context("function based monadic function"):
-        with description("#bind"):
+    # Specs for v0.1.0
+    for k, do_nothing_mf in {"function based": do_nothing_monadic_func1, \
+                             "class based": do_nothing_monadic_func_class_based, \
+                             "flippable class based": do_nothing_monadic_func_flippable_class_based}.items():
 
-            @it("binds with new monad")
-            def _(self):
-                m = IterableMonad(DATA)
-                m2 = m.bind(DO_NOTHING_MF1)
-                assert_that(m2.iterable, equal_to(DATA))
+        with context(f"{k} monadic function"):
+            with description("#bind"):
 
-        with description("#__or__"):
+                @it("binds with new monad")
+                def _(self):
+                    m = IterableMonad(DATA)
+                    m2 = m.bind(do_nothing_mf)
+                    assert_that(m2.iterable, equal_to(DATA))
 
-            @it("binds with new monad")
-            def _(self):
-                m = IterableMonad(DATA)
-                m2 = m | DO_NOTHING_MF1
-                assert_that(m2.iterable, equal_to(DATA))
+            with description("#__or__"):
 
-    with context("class based monadic function"):
-        with description("#bind"):
-
-            @it("binds with new monad")
-            def _(self):
-                m = IterableMonad(DATA)
-                m2 = m.bind(DO_NOTHING_MF2)
-                assert_that(m2.iterable, equal_to(DATA))
-
-        with description("#__or__"):
-
-            @it("binds with new monad")
-            def _(self):
-                m = IterableMonad(DATA)
-                m2 = m | DO_NOTHING_MF2
-                assert_that(m2.iterable, equal_to(DATA))
+                @it("binds with new monad")
+                def _(self):
+                    m = IterableMonad(DATA)
+                    m2 = m | do_nothing_mf
+                    assert_that(m2.iterable, equal_to(DATA))
 
     ################################
-    # Specs from v0.2.0
+    # Specs for v0.2.0
     with description("#redirect_to"):
 
         @it("puts recoreds into sink")
@@ -102,6 +101,23 @@ with description("dw.dsl.IterableMonad"):
         @it("puts recoreds into sink with append mode")
         def _(self):
             assert_that(IterableMonad(["a", "b"]) >> ["x"], equal_to(["x", "a", "b"]))
+
+
+with description("dw.dsl.FlippableIterableMonadicFunction"):
+
+    ################################
+    # Specs for v0.3.0
+    with description("#__call__"):
+
+        @it("puts recoreds into sink")
+        def _(self):
+            assert_that((IterableMonad(["a", "b"]) | do_nothing_monadic_func_flippable_class_based) > [], equal_to(["a", "b"]))
+
+    with description("#__ror__"):
+
+        @it("puts recoreds into sink")
+        def _(self):
+            assert_that((["a", "b"] | do_nothing_monadic_func_flippable_class_based) > [], equal_to(["a", "b"]))
 
 
 if __name__ == '__main__':

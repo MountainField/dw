@@ -93,6 +93,26 @@ class IterableMonad(object):
     __rshift__ = appending_redirect_to  # (range(5) | sort() ) >> "filename". because >> is stronger than |.
 
 
+################################################################################
+# Class that is superposition of Monad and MonadicFunction.
+# If it is called as function, it behaves like Monadic Function and returns Monad
+# If it is called as a argument of __ror__, it behaves like Monad
+class FlippableIterableMonadicFunction(AbstractIterableMonadicFunction):
+
+    def __init__(self, monadic_function: _Callable):
+        self._mf: _Callable = monadic_function
+
+    def __call__(self, iterable: _Iterable) -> IterableMonad:
+        return self._mf(iterable)
+
+    def __ror__(self, iterable: _Iterable) -> IterableMonad:
+        return IterableMonad(iterable, name=type(iterable).__name__).bind(self._mf)
+
+
+################################################################################
+#  Tee
+
+
 def tee(sink: object, append: bool = False) -> _Callable:
 
     def monadic_func(iterable: _Iterable) -> _Iterable[object]:
