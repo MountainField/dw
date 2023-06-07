@@ -23,7 +23,7 @@ def DO_NOTHING_MF1(iterable: _Iterable) -> IterableMonad:
     return IterableMonad(iterable)
 
 
-class DoNothingMF2:
+class DoNothingMF2(AbstractIterableMonadicFunction):
 
     def __call__(self, iterable: _Iterable) -> IterableMonad:
         return IterableMonad(iterable)

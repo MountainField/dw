@@ -17,12 +17,20 @@ from collections.abc import Iterator as _Iterator
 from collections.abc import Callable as _Callable
 from collections.abc import Sequence as _Sequence
 
+from abc import ABC, abstractmethod
 import io as _io
 import logging as _logging
 
 _LOGGER: _logging.Logger = _logging.getLogger(__name__)
 
 _DEBUG: bool = True
+
+
+class AbstractIterableMonadicFunction(ABC):
+
+    @abstractmethod
+    def __call__(self, iterable: _Iterable) -> IterableMonad:
+        pass
 
 
 class IterableMonad(object):

@@ -44,3 +44,12 @@ def tr(set1: str, set2: str) -> _Callable:
             yield row_out
 
     return monadic_func
+
+
+class _tr2(AbstractIterableMonadicFunction):
+
+    def __init__(self, set1: str, set2: str):
+        self.f = tr(set1, set2)
+
+    def __call__(self, iterable: _Iterable) -> IterableMonad:
+        return self.f(iterable)
