@@ -19,9 +19,17 @@ from dw.dsl import *
 DATA: list[str] = ["a", "b"]
 
 
-def DO_NOTHING_MF(iterable: _Iterable) -> IterableMonad:
+def DO_NOTHING_MF1(iterable: _Iterable) -> IterableMonad:
     return IterableMonad(iterable)
 
+
+class DoNothingMF2:
+
+    def __call__(self, iterable: _Iterable) -> IterableMonad:
+        return IterableMonad(iterable)
+
+
+DO_NOTHING_MF2 = DoNothingMF2()
 
 with description("dw.dsl.IterableMonad"):
 
@@ -35,21 +43,39 @@ with description("dw.dsl.IterableMonad"):
 
     ################################
     # Specs from v0.1.0
-    with description("#bind"):
+    with context("function based monadic function"):
+        with description("#bind"):
 
-        @it("binds with new monad")
-        def _(self):
-            m = IterableMonad(DATA)
-            m2 = m.bind(DO_NOTHING_MF)
-            assert_that(m2.iterable, equal_to(DATA))
+            @it("binds with new monad")
+            def _(self):
+                m = IterableMonad(DATA)
+                m2 = m.bind(DO_NOTHING_MF1)
+                assert_that(m2.iterable, equal_to(DATA))
 
-    with description("#__or__"):
+        with description("#__or__"):
 
-        @it("binds with new monad")
-        def _(self):
-            m = IterableMonad(DATA)
-            m2 = m | DO_NOTHING_MF
-            assert_that(m2.iterable, equal_to(DATA))
+            @it("binds with new monad")
+            def _(self):
+                m = IterableMonad(DATA)
+                m2 = m | DO_NOTHING_MF1
+                assert_that(m2.iterable, equal_to(DATA))
+
+    with context("class based monadic function"):
+        with description("#bind"):
+
+            @it("binds with new monad")
+            def _(self):
+                m = IterableMonad(DATA)
+                m2 = m.bind(DO_NOTHING_MF2)
+                assert_that(m2.iterable, equal_to(DATA))
+
+        with description("#__or__"):
+
+            @it("binds with new monad")
+            def _(self):
+                m = IterableMonad(DATA)
+                m2 = m | DO_NOTHING_MF2
+                assert_that(m2.iterable, equal_to(DATA))
 
     ################################
     # Specs from v0.2.0

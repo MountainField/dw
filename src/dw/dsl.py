@@ -36,7 +36,10 @@ class IterableMonad(object):
     ################################################
     # implements monad
     def bind(self, mf: _Callable) -> IterableMonad:
-        _LOGGER.debug("Binding from IM: %s to MF: %s", self.name, mf.__name__)
+        mf_name:str = mf.__name__ if getattr(mf, "__name__", None) else \
+                      mf.__class__.__name__ if getattr(mf, "__class__", None) else \
+                      "mf"
+        _LOGGER.debug("Binding from IM: %s to MF: %s", self.name, mf_name)
         new_im: IterableMonad = mf(self.iterable)
         return new_im
 
