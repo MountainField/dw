@@ -62,7 +62,7 @@ with description("dw.dsl.IterableMonad"):
         with context(f"{k} monadic function"):
             with description("#bind"):
 
-                @it("binds with new monad")
+                @it("returns a new monad")
                 def _(self):
                     m = IterableMonad(DATA)
                     m2 = m.bind(do_nothing_mf)
@@ -70,10 +70,16 @@ with description("dw.dsl.IterableMonad"):
 
             with description("#__or__"):
 
-                @it("binds with new monad")
+                @it("returns a new monad")
                 def _(self):
                     m = IterableMonad(DATA)
                     m2 = m | do_nothing_mf
+                    assert_that(m2.iterable, equal_to(DATA))
+
+                @it("can connect mulitple monadic functions")
+                def _(self):
+                    m = IterableMonad(DATA)
+                    m2 = m | do_nothing_mf | do_nothing_mf | do_nothing_mf
                     assert_that(m2.iterable, equal_to(DATA))
 
     ################################
@@ -109,13 +115,13 @@ with description("dw.dsl.FlippableIterableMonadicFunction"):
     # Specs for v0.3.0
     with description("#__call__"):
 
-        @it("puts recoreds into sink")
+        @it("returns a new IterableMonad")
         def _(self):
             assert_that((IterableMonad(["a", "b"]) | do_nothing_monadic_func_flippable_class_based) > [], equal_to(["a", "b"]))
 
     with description("#__ror__"):
 
-        @it("puts recoreds into sink")
+        @it("wraps the left iterable, apply the monadic function, and returns a new IterableMonad")
         def _(self):
             assert_that((["a", "b"] | do_nothing_monadic_func_flippable_class_based) > [], equal_to(["a", "b"]))
 
