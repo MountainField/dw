@@ -127,15 +127,13 @@ def pipeable(f):
 
 def tee(sink: object, append: bool = False) -> _Callable:
 
-    def monadic_func(iterable: _Iterable) -> _Iterable[object]:
-
-        if isinstance(sink, _Sequence):
+    if isinstance(sink, _Sequence):
+        def monadic_func(iterable: _Iterable) -> _Iterable[object]:
             if not append:
                 sink.clear()
             for obj in iterable:
                 sink.append(obj)
                 yield obj
-        else:
-            raise ValueError(f"sink=={sink} is not instance of either io, Sequence, or Set")
-
-    return monadic_func
+        return monadic_func
+    else:
+        raise ValueError(f"sink=={sink} is not instance of either io, Sequence, or Set")
