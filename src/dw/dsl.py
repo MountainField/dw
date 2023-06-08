@@ -16,6 +16,7 @@ from collections.abc import Iterable as _Iterable
 from collections.abc import Iterator as _Iterator
 from collections.abc import Callable as _Callable
 from collections.abc import Sequence as _Sequence
+from collections.abc import Set as _Set
 
 from abc import ABC, abstractmethod
 import io as _io
@@ -124,16 +125,52 @@ def pipeable(f):
 ################################################################################
 #  Tee
 
+_SINK_CHECKER__AND__TEE_MFUNC_F: list[_Callable, _Callable] = []
+
+
+def register_tee(sink_checker: _Callable, tee_mf_f: _Callable):
+    _SINK_CHECKER__AND__TEE_MFUNC_F.append([sink_checker, tee_mf_f])
+
 
 def tee(sink: object, append: bool = False) -> _Callable:
 
-    if isinstance(sink, _Sequence):
-        def monadic_func(iterable: _Iterable) -> _Iterable[object]:
-            if not append:
-                sink.clear()
-            for obj in iterable:
-                sink.append(obj)
-                yield obj
-        return monadic_func
-    else:
-        raise ValueError(f"sink=={sink} is not instance of either io, Sequence, or Set")
+    for key_f, tee_mf_f in _SINK_CHECKER__AND__TEE_MFUNC_F:
+        if key_f(sink):
+            tee_mf = tee_mf_f(sink, append)
+            return tee_mf
+
+    raise ValueError(f"sink=={sink} is not instance of either io, Sequence, or Set")
+
+
+################################################################################
+#  Tee for list
+def tee_to_list(sink: object, append: bool = False) -> _Callable:
+
+    def monadic_func(iterable: _Iterable) -> _Iterable[object]:
+        if not append:
+            sink.clear()
+        for obj in iterable:
+            sink.append(obj)
+            yield obj
+
+    return monadic_func
+
+
+register_tee(lambda sink: isinstance(sink, _Sequence), tee_to_list)
+
+
+################################################################################
+#  Tee for set
+def tee_to_set(sink: object, append: bool = False) -> _Callable:
+
+    def monadic_func(iterable: _Iterable) -> _Iterable[object]:
+        if not append:
+            sink.clear()
+        for obj in iterable:
+            sink.add(obj)
+            yield obj
+
+    return monadic_func
+
+
+register_tee(lambda sink: isinstance(sink, _Set), tee_to_set)

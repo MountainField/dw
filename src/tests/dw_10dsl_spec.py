@@ -121,6 +121,14 @@ with description("dw.dsl.IterableMonad"):
         def _(self):
             assert_that(IterableMonad(["a", "b"]) >> ["x"], equal_to(["x", "a", "b"]))
 
+    ################################
+    # Specs for v0.5.0
+    with description("dw.dsl.tee"):
+
+        @it("puts recoreds into set sink")
+        def _(self):
+            assert_that(IterableMonad(["a", "b"]) > set(), equal_to(set(["a", "b"])))
+
 
 with description("dw.dsl.FlippableIterableMonadicFunction"):
 
