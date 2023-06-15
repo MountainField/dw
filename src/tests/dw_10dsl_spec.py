@@ -14,13 +14,12 @@ from collections.abc import Iterable as _Iterable
 from uspec import description, context, it, execute_command
 from hamcrest import assert_that, equal_to, instance_of, is_not
 
+import dw
 from dw.dsl import *
-
-DATA: list[str] = ["a", "b"]
 
 
 ####
-def do_nothing_monadic_func1(iterable: _Iterable) -> IterableMonad:
+def do_nothing_mf_v1(iterable: _Iterable) -> IterableMonad:
     return IterableMonad(iterable)
 
 
@@ -31,20 +30,20 @@ class DoNothingMFClassBased(AbstractIterableMonadicFunction):
         return IterableMonad(iterable)
 
 
-do_nothing_monadic_func_class_based = DoNothingMFClassBased()
+do_nothing_mf_v2 = DoNothingMFClassBased()
 
 
 ####
 class DoNothingMFFlippableClassBased(FlippableIterableMonadicFunction):
 
     def __init__(self):
-        super().__init__(monadic_function=do_nothing_monadic_func1)
+        super().__init__(iterable_monadic_function=do_nothing_mf_v1)
 
 
-do_nothing_monadic_func_flippable_class_based = DoNothingMFFlippableClassBased()
+do_nothing_mf_v3 = DoNothingMFFlippableClassBased()
 
 
-@pipeable
+@higher_order_iterable_monadic_function
 def do_nothing_monadic_func_by_decorator_f():
 
     def f(iterable: _Iterable) -> IterableMonad:
@@ -53,7 +52,7 @@ def do_nothing_monadic_func_by_decorator_f():
     return f
 
 
-do_nothing_monadic_func_by_decorator = do_nothing_monadic_func_by_decorator_f()
+do_nothing_mf_v4 = do_nothing_monadic_func_by_decorator_f()
 
 with description("dw.dsl.IterableMonad"):
 
@@ -65,35 +64,23 @@ with description("dw.dsl.IterableMonad"):
         def _(self):
             assert_that(list(IterableMonad(["a", "b"])), equal_to(["a", "b"]))
 
-    ################################
-    # Specs for v0.1.0 - v0.4.0
-    for k, do_nothing_mf in {"function based": do_nothing_monadic_func1, \
-                             "class based": do_nothing_monadic_func_class_based, \
-                             "flippable class based": do_nothing_monadic_func_flippable_class_based,
-                             "decorator based": do_nothing_monadic_func_by_decorator}.items():
+    with description("#bind"):
 
-        with context(f"{k} monadic function"):
-            with description("#bind"):
+        @it("returns a new monad")
+        def _(self):
+            m = IterableMonad(["a", "b"])
+            m2 = m.bind(do_nothing_mf_v1)
+            assert_that(m2, instance_of(IterableMonad))
+            assert_that(m2.iterable, equal_to(["a", "b"]))
 
-                @it("returns a new monad")
-                def _(self):
-                    m = IterableMonad(DATA)
-                    m2 = m.bind(do_nothing_mf)
-                    assert_that(m2.iterable, equal_to(DATA))
+    with description("IterableMonad | mf"):
 
-            with description("#__or__"):
-
-                @it("returns a new monad")
-                def _(self):
-                    m = IterableMonad(DATA)
-                    m2 = m | do_nothing_mf
-                    assert_that(m2.iterable, equal_to(DATA))
-
-                @it("can connect mulitple monadic functions")
-                def _(self):
-                    m = IterableMonad(DATA)
-                    m2 = m | do_nothing_mf | do_nothing_mf | do_nothing_mf
-                    assert_that(m2.iterable, equal_to(DATA))
+        @it("returns a new monad")
+        def _(self):
+            m = IterableMonad(["a", "b"])
+            m2 = m | do_nothing_mf_v1
+            assert_that(m2, instance_of(IterableMonad))
+            assert_that(m2.iterable, equal_to(["a", "b"]))
 
     ################################
     # Specs for v0.2.0
@@ -121,33 +108,82 @@ with description("dw.dsl.IterableMonad"):
         def _(self):
             assert_that(IterableMonad(["a", "b"]) >> ["x"], equal_to(["x", "a", "b"]))
 
-    ################################
-    # Specs for v0.5.0
-    with description("dw.dsl.tee"):
 
-        @it("puts recoreds into set sink")
-        def _(self):
-            assert_that(IterableMonad(["a", "b"]) > set(), equal_to(set(["a", "b"])))
+################################
+# Specs for v0.2.0
+def monadic_function_v1_spec(name, mf, is_do_nothing=False):
+
+    with context(f"monadic function: {name}"):
+
+        with description("__call__(Iterable)"):
+
+            @it("returns a new monad")
+            def _(self):
+                m2 = mf(["a", "b"])
+                assert_that(m2, instance_of(IterableMonad))
+                if is_do_nothing:
+                    assert_that(m2.iterable, equal_to(["a", "b"]))
 
 
-with description("dw.dsl.FlippableIterableMonadicFunction"):
+monadic_function_v1_spec("do_nothing_mf_v1", do_nothing_mf_v1, is_do_nothing=True)
+monadic_function_v1_spec("do_nothing_mf_v2", do_nothing_mf_v2, is_do_nothing=True)
 
-    ################################
-    # Specs for v0.3.0 -v0.4.0
-    for k, do_nothing_mf in {"flippable class based": do_nothing_monadic_func_flippable_class_based,\
-                              "decorator based": do_nothing_monadic_func_by_decorator}.items():
-        with context(f"{k} monadic function"):
-            with description("#__call__"):
 
-                @it("returns a new IterableMonad")
-                def _(self):
-                    assert_that((IterableMonad(["a", "b"]) | do_nothing_mf) > [], equal_to(["a", "b"]))
+################################
+# Specs for v0.3.0
+def monadic_function_v3_spec(name, mf, is_do_nothing=False):
 
-            with description("#__ror__"):
+    with context(f"monadic function: {name}"):
 
-                @it("wraps the left iterable, apply the monadic function, and returns a new IterableMonad")
-                def _(self):
-                    assert_that((["a", "b"] | do_nothing_mf) > [], equal_to(["a", "b"]))
+        with description("__ror__(Iterable)"):
+
+            @it("returns a new monad")
+            def _(self):
+                m2 = ["a", "b"] | mf
+                assert_that(m2, instance_of(IterableMonad))
+                if is_do_nothing:
+                    assert_that(m2.iterable, equal_to(["a", "b"]))
+
+
+monadic_function_v1_spec("do_nothing_mf_v3", do_nothing_mf_v3, is_do_nothing=True)
+monadic_function_v3_spec("do_nothing_mf_v3", do_nothing_mf_v3, is_do_nothing=True)
+
+
+def monadic_function_all_spec(name, mf, is_do_nothing=False):
+    print("name: ", name)
+    monadic_function_v1_spec(name, mf, is_do_nothing)
+    monadic_function_v3_spec(name, mf, is_do_nothing)
+
+
+monadic_function_all_spec("do_nothing_mf_v4", do_nothing_mf_v4, is_do_nothing=True)
+
+monadic_function_all_spec("tee_to_set", dw.dsl.tee_to_set(set()))
+monadic_function_all_spec("tee", dw.dsl.tee([]))
+
+################################
+# Specs for v0.5.0
+monadic_function_all_spec("dw.dsl.tee_to_list", dw.dsl.tee_to_list([]))
+
+with description("dw.dsl.tee_to_list"):
+
+    @it("puts recoreds into list sink")
+    def _(self):
+        l = []
+        consume(IterableMonad(["a", "b"]) | tee_to_list(l))
+        assert_that(l, equal_to(["a", "b"]))
+
+    @it("puts recoreds into list sink")
+    def _(self):
+        l = []
+        consume(["a", "b"] | tee_to_list(l))
+        assert_that(l, equal_to(["a", "b"]))
+
+    @it("puts recoreds into list sink")
+    def _(self):
+        l = []
+        l2 = IterableMonad(["a", "b"]) > l
+        assert_that(l, equal_to(["a", "b"]))
+        assert_that(l2, equal_to(["a", "b"]))
 
 
 if __name__ == '__main__':

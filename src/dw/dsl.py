@@ -27,6 +27,11 @@ _LOGGER: _logging.Logger = _logging.getLogger(__name__)
 _DEBUG: bool = True
 
 
+def consume(iterable: _Iterable):
+    for _ in iterable:
+        pass
+
+
 class AbstractIterableMonadicFunction(ABC):
 
     @abstractmethod
@@ -44,12 +49,12 @@ class IterableMonad(object):
 
     ################################################
     # implements monad
-    def bind(self, mf: _Callable) -> IterableMonad:
-        mf_name:str = mf.__name__ if getattr(mf, "__name__", None) else \
-                      mf.__class__.__name__ if getattr(mf, "__class__", None) else \
-                      "mf"
-        _LOGGER.debug("Binding from IM: %s to MF: %s", self.name, mf_name)
-        new_im: IterableMonad = mf(self.iterable)
+    def bind(self, imf: _Callable) -> IterableMonad:
+        imf_name:str = imf.__name__ if getattr(imf, "__name__", None) else \
+                      imf.__class__.__name__ if getattr(imf, "__class__", None) else \
+                      "imf"
+        _LOGGER.debug("Binding from IM: %s to IMF: %s", self.name, imf_name)
+        new_im: IterableMonad = imf(self.iterable)
         return new_im
 
     __or__ = bind
@@ -100,77 +105,90 @@ class IterableMonad(object):
 # If it is called as a argument of __ror__, it wraps iterable and returns Monad
 class FlippableIterableMonadicFunction(AbstractIterableMonadicFunction):
 
-    def __init__(self, monadic_function: _Callable):
-        self._mf: _Callable = monadic_function
+    def __init__(self, iterable_monadic_function: _Callable):
+        self._iterable_monadic_function: _Callable = iterable_monadic_function
 
     def __call__(self, iterable: _Iterable) -> IterableMonad:
-        return self._mf(iterable)
+        return self._iterable_monadic_function(iterable)
 
     def __ror__(self, iterable: _Iterable) -> IterableMonad:
-        return IterableMonad(iterable, name=type(iterable).__name__).bind(self._mf)
+        return IterableMonad(iterable, name=type(iterable).__name__).bind(self._iterable_monadic_function)
 
 
 ################################################################################
 # Decorator
 
 
-def pipeable(f):
-    # return FlippableIterableMonadicFunction(f)
-    def g(*args, **kwargs):
-        return FlippableIterableMonadicFunction(f(*args, *kwargs))
+def higher_order_iterable_monadic_function(higher_order_monadic_function):
 
-    return g
+    def higher_order_flippable_iterable_monadic_function(*args, **kwargs):
+        monadic_function = higher_order_monadic_function(*args, *kwargs)
+        return FlippableIterableMonadicFunction(monadic_function)
+
+    return higher_order_flippable_iterable_monadic_function
 
 
 ################################################################################
 #  Tee
 
-_SINK_CHECKER__AND__TEE_MFUNC_F: list[_Callable, _Callable] = []
+_SINK_CHECKER__AND__TEE_HOIMF: list[_Callable, _Callable] = []
 
 
-def register_tee(sink_checker: _Callable, tee_mf_f: _Callable):
-    _SINK_CHECKER__AND__TEE_MFUNC_F.append([sink_checker, tee_mf_f])
+def register_tee(sink_checker: _Callable, tee_higher_order_iterable_monadic_function: _Callable):
+    _SINK_CHECKER__AND__TEE_HOIMF.append([sink_checker, tee_higher_order_iterable_monadic_function])
 
 
+@higher_order_iterable_monadic_function
 def tee(sink: object, append: bool = False) -> _Callable:
 
-    for key_f, tee_mf_f in _SINK_CHECKER__AND__TEE_MFUNC_F:
+    for key_f, tee_hoimf in _SINK_CHECKER__AND__TEE_HOIMF:
         if key_f(sink):
-            tee_mf = tee_mf_f(sink, append)
-            return tee_mf
+            tee_imf = tee_hoimf(sink, append)
+            return tee_imf
 
     raise ValueError(f"sink=={sink} is not instance of either io, Sequence, or Set")
 
 
 ################################################################################
 #  Tee for list
+@higher_order_iterable_monadic_function
 def tee_to_list(sink: object, append: bool = False) -> _Callable:
 
-    def monadic_func(iterable: _Iterable) -> _Iterable[object]:
-        if not append:
-            sink.clear()
-        for obj in iterable:
-            sink.append(obj)
-            yield obj
+    def iterable_monadic_function(iterable: _Iterable) -> _Iterable[object]:
 
-    return monadic_func
+        def generator():
+            if not append:
+                sink.clear()
+            for obj in iterable:
+                sink.append(obj)
+                yield obj
+
+        return IterableMonad(generator())
+
+    return iterable_monadic_function
 
 
 register_tee(lambda sink: isinstance(sink, _Sequence), tee_to_list)
 
-
 ################################################################################
 #  Tee for set
+
+
+@higher_order_iterable_monadic_function
 def tee_to_set(sink: object, append: bool = False) -> _Callable:
 
-    def monadic_func(iterable: _Iterable) -> _Iterable[object]:
-        if not append:
-            sink.clear()
-        for obj in iterable:
-            sink.add(obj)
-            yield obj
+    def iterable_monadic_function(iterable: _Iterable) -> _Iterable[object]:
 
-    return monadic_func
+        def generator():
+            if not append:
+                sink.clear()
+            for obj in iterable:
+                sink.add(obj)
+                yield obj
+
+        return IterableMonad(generator())
+
+    return iterable_monadic_function
 
 
 register_tee(lambda sink: isinstance(sink, _Set), tee_to_set)

@@ -65,22 +65,26 @@ class _tr2(AbstractIterableMonadicFunction):
 class _tr3(FlippableIterableMonadicFunction):
 
     def __init__(self, set1: str, set2: str):
-        super().__init__(monadic_function=tr1(set1, set2))
+        super().__init__(iterable_monadic_function=tr1(set1, set2))
 
 
 ################################
 # based on v0.4.0
-@pipeable
+@higher_order_iterable_monadic_function
 def _tr4(set1: str, set2: str) -> _Callable:
 
-    def mf(iterable: _Iterable[str]) -> _Iterable[str]:
-        row_in: str
-        row_out: str
-        for row_in in iterable:
-            if set1 in row_in:
-                row_out = row_in.replace(set1, set2)
-            else:
-                row_out = row_in
-            yield row_out
+    def iterable_monadic_function(iterable: _Iterable[str]) -> _Iterable[str]:
 
-    return mf
+        def generator():
+            row_in: str
+            row_out: str
+            for row_in in iterable:
+                if set1 in row_in:
+                    row_out = row_in.replace(set1, set2)
+                else:
+                    row_out = row_in
+                yield row_out
+
+        return IterableMonad(generator())
+
+    return iterable_monadic_function
