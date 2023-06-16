@@ -38,6 +38,9 @@ class AbstractIterableMonadicFunction(ABC):
     def __call__(self, iterable: _Iterable) -> IterableMonad:
         pass
 
+    # @abstractattribute
+    # def __name__(self): pass
+
 
 class IterableMonad(object):
 
@@ -105,8 +108,9 @@ class IterableMonad(object):
 # If it is called as a argument of __ror__, it wraps iterable and returns Monad
 class FlippableIterableMonadicFunction(AbstractIterableMonadicFunction):
 
-    def __init__(self, iterable_monadic_function: _Callable):
+    def __init__(self, iterable_monadic_function: _Callable, name: str = "FlippableIterableMonadicFunction"):
         self._iterable_monadic_function: _Callable = iterable_monadic_function
+        self.__name__: str = name
 
     def __call__(self, iterable: _Iterable) -> IterableMonad:
         return self._iterable_monadic_function(iterable)
@@ -123,7 +127,7 @@ def higher_order_iterable_monadic_function(higher_order_monadic_function):
 
     def higher_order_flippable_iterable_monadic_function(*args, **kwargs):
         monadic_function = higher_order_monadic_function(*args, *kwargs)
-        return FlippableIterableMonadicFunction(monadic_function)
+        return FlippableIterableMonadicFunction(monadic_function, name=higher_order_monadic_function.__name__)
 
     return higher_order_flippable_iterable_monadic_function
 

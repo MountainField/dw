@@ -11,7 +11,7 @@
 
 from collections.abc import Iterable as _Iterable
 
-from uspec import description, context, it, execute_command
+from uspec import description, context, it, execute_command, shared_example_of
 from hamcrest import assert_that, equal_to, instance_of, is_not
 
 import dw
@@ -25,6 +25,9 @@ def do_nothing_mf_v1(iterable: _Iterable) -> IterableMonad:
 
 ####
 class DoNothingMFClassBased(AbstractIterableMonadicFunction):
+
+    def __init__(self):
+        self.__name__ = "do_nothing_mf_v2"
 
     def __call__(self, iterable: _Iterable) -> IterableMonad:
         return IterableMonad(iterable)
@@ -44,7 +47,7 @@ do_nothing_mf_v3 = DoNothingMFFlippableClassBased()
 
 
 @higher_order_iterable_monadic_function
-def do_nothing_monadic_func_by_decorator_f():
+def do_nothing_hoimf_v4():
 
     def f(iterable: _Iterable) -> IterableMonad:
         return IterableMonad(iterable)
@@ -52,7 +55,7 @@ def do_nothing_monadic_func_by_decorator_f():
     return f
 
 
-do_nothing_mf_v4 = do_nothing_monadic_func_by_decorator_f()
+do_nothing_mf_v4 = do_nothing_hoimf_v4()
 
 with description("dw.dsl.IterableMonad"):
 
@@ -111,9 +114,10 @@ with description("dw.dsl.IterableMonad"):
 
 ################################
 # Specs for v0.2.0
-def monadic_function_v1_spec(name, mf, is_do_nothing=False):
+@shared_example_of("v1")
+def _(mf, is_do_nothing=False, context_stack=[]):
 
-    with context(f"monadic function: {name}"):
+    with context(f"monadic function: {mf.__name__}"):
 
         with description("__call__(Iterable)"):
 
@@ -125,15 +129,19 @@ def monadic_function_v1_spec(name, mf, is_do_nothing=False):
                     assert_that(m2.iterable, equal_to(["a", "b"]))
 
 
-monadic_function_v1_spec("do_nothing_mf_v1", do_nothing_mf_v1, is_do_nothing=True)
-monadic_function_v1_spec("do_nothing_mf_v2", do_nothing_mf_v2, is_do_nothing=True)
+with description(do_nothing_mf_v1):
+    it.behaves_like("v1", is_do_nothing=True)
+
+with description(do_nothing_mf_v2):
+    it.behaves_like("v1", is_do_nothing=True)
 
 
 ################################
 # Specs for v0.3.0
-def monadic_function_v3_spec(name, mf, is_do_nothing=False):
+@shared_example_of("v3")
+def _(mf, is_do_nothing=False, context_stack=[]):
 
-    with context(f"monadic function: {name}"):
+    with context(f"monadic function: {mf.__name__}"):
 
         with description("__ror__(Iterable)"):
 
@@ -145,24 +153,31 @@ def monadic_function_v3_spec(name, mf, is_do_nothing=False):
                     assert_that(m2.iterable, equal_to(["a", "b"]))
 
 
-monadic_function_v1_spec("do_nothing_mf_v3", do_nothing_mf_v3, is_do_nothing=True)
-monadic_function_v3_spec("do_nothing_mf_v3", do_nothing_mf_v3, is_do_nothing=True)
+with description(do_nothing_mf_v3):
+    it.behaves_like("v1", is_do_nothing=True)
+    it.behaves_like("v3", is_do_nothing=True)
 
 
-def monadic_function_all_spec(name, mf, is_do_nothing=False):
-    print("name: ", name)
-    monadic_function_v1_spec(name, mf, is_do_nothing)
-    monadic_function_v3_spec(name, mf, is_do_nothing)
+@shared_example_of("iterable_monadic_function")
+def _(mf, is_do_nothing=False, context_stack=[]):
+
+    with description(mf):
+
+        it.behaves_like("v1", is_do_nothing=is_do_nothing)
+        it.behaves_like("v3", is_do_nothing=is_do_nothing)
 
 
-monadic_function_all_spec("do_nothing_mf_v4", do_nothing_mf_v4, is_do_nothing=True)
+with description(do_nothing_mf_v4):
+    it.behaves_like("iterable_monadic_function", is_do_nothing=True)
 
-monadic_function_all_spec("tee_to_set", dw.dsl.tee_to_set(set()))
-monadic_function_all_spec("tee", dw.dsl.tee([]))
+with description(dw.dsl.tee_to_set(set())):
+    it.behaves_like("iterable_monadic_function")
 
 ################################
 # Specs for v0.5.0
-monadic_function_all_spec("dw.dsl.tee_to_list", dw.dsl.tee_to_list([]))
+
+with description(dw.dsl.tee_to_list([])):
+    it.behaves_like("iterable_monadic_function")
 
 with description("dw.dsl.tee_to_list"):
 

@@ -11,11 +11,13 @@
 
 from collections.abc import Iterable as _Iterable
 
-from uspec import description, context, it, execute_command
+from uspec import description, context, it, execute_command, shared_example_of
 from hamcrest import assert_that, equal_to, instance_of, is_not
 
 from dw.tool.tr import *
 from dw.tool.tr import _tr2, _tr3, _tr4
+
+from tests import dw_10dsl_spec
 
 with description("dw.tool.tr.tr"):
 
@@ -37,6 +39,9 @@ with description("dw.tool.tr.tr3"):
     def _(self):
         assert_that(list(IterableMonad(["abc", "xaz"]) | _tr3("a", "A")), equal_to(["Abc", "xAz"]))
 
+
+with description(_tr4("a", "A")):
+    it.behaves_like("iterable_monadic_function")
 
 with description("dw.tool.tr.tr4"):
 
