@@ -136,8 +136,8 @@ def higher_order_iterable_monadic_function(higher_order_monadic_function):
 # v7
 def higher_order_generator_function(higher_order_generator_function):
 
-    def higher_order_flippable_iterable_monadic_function(sink, *args, **kwargs):
-        generator = higher_order_generator_function(sink, *args, **kwargs)
+    def higher_order_flippable_iterable_monadic_function(*args, **kwargs):
+        generator = higher_order_generator_function(*args, **kwargs)
 
         def iterable_monadic_function(iterable: _Iterable) -> _Iterable[object]:
             return IterableMonad(generator(iterable))

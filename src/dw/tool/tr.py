@@ -88,3 +88,22 @@ def _tr4(set1: str, set2: str) -> _Callable:
         return IterableMonad(generator())
 
     return iterable_monadic_function
+
+
+################################
+# based on v0.7.0
+@higher_order_generator_function
+def _tr7(set1: str, set2: str) -> _Callable:
+
+    def generator(iterable: _Iterable[str]) -> _Iterable[str]:
+
+        row_in: str
+        row_out: str
+        for row_in in iterable:
+            if set1 in row_in:
+                row_out = row_in.replace(set1, set2)
+            else:
+                row_out = row_in
+            yield row_out
+
+    return generator

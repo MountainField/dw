@@ -57,6 +57,18 @@ def do_nothing_hoimf_v4():
 
 do_nothing_mf_v4 = do_nothing_hoimf_v4()
 
+
+@higher_order_generator_function
+def do_nothing_hoimf_v7():
+
+    def g(iterable: _Iterable) -> IterableMonad:
+        return iterable
+
+    return g
+
+
+do_nothing_mf_v7 = do_nothing_hoimf_v7()
+
 with description("dw.dsl.IterableMonad"):
 
     ################################
@@ -168,6 +180,9 @@ def _(mf, is_do_nothing=False, context_stack=[]):
 
 
 with description(do_nothing_mf_v4):
+    it.behaves_like("iterable_monadic_function", is_do_nothing=True)
+
+with description(do_nothing_mf_v7):
     it.behaves_like("iterable_monadic_function", is_do_nothing=True)
 
 with description(dw.dsl.tee_to_set(set())):

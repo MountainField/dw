@@ -15,7 +15,7 @@ from uspec import description, context, it, execute_command, shared_example_of
 from hamcrest import assert_that, equal_to, instance_of, is_not
 
 from dw.tool.tr import *
-from dw.tool.tr import _tr2, _tr3, _tr4
+from dw.tool.tr import _tr2, _tr3, _tr4, _tr7
 
 from tests import dw_10dsl_spec
 
@@ -48,6 +48,13 @@ with description("dw.tool.tr.tr4"):
     @it("replaces a single character ")
     def _(self):
         assert_that(list(IterableMonad(["abc", "xaz"]) | _tr4("a", "A")), equal_to(["Abc", "xAz"]))
+
+
+with description("dw.tool.tr.tr7"):
+
+    @it("replaces a single character ")
+    def _(self):
+        assert_that(list(IterableMonad(["abc", "xaz"]) | _tr7("a", "A")), equal_to(["Abc", "xAz"]))
 
 
 if __name__ == '__main__':
