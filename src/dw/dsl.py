@@ -123,11 +123,26 @@ class FlippableIterableMonadicFunction(AbstractIterableMonadicFunction):
 # Decorator
 
 
+# v6
 def higher_order_iterable_monadic_function(higher_order_monadic_function):
 
     def higher_order_flippable_iterable_monadic_function(*args, **kwargs):
         monadic_function = higher_order_monadic_function(*args, *kwargs)
         return FlippableIterableMonadicFunction(monadic_function, name=higher_order_monadic_function.__name__)
+
+    return higher_order_flippable_iterable_monadic_function
+
+
+# v7
+def higher_order_generator_function(higher_order_generator_function):
+
+    def higher_order_flippable_iterable_monadic_function(sink, *args, **kwargs):
+        generator = higher_order_generator_function(sink, *args, **kwargs)
+
+        def iterable_monadic_function(iterable: _Iterable) -> _Iterable[object]:
+            return IterableMonad(generator(iterable))
+
+        return FlippableIterableMonadicFunction(iterable_monadic_function, name=higher_order_generator_function.__name__)
 
     return higher_order_flippable_iterable_monadic_function
 
@@ -155,21 +170,32 @@ def tee(sink: object, append: bool = False) -> _Callable:
 
 ################################################################################
 #  Tee for list
-@higher_order_iterable_monadic_function
+# v6
+# @higher_order_iterable_monadic_function
+# def tee_to_list(sink: object, append: bool = False) -> _Callable:
+#     def iterable_monadic_function(iterable: _Iterable) -> _Iterable[object]:
+#         def generator():
+#             if not append:
+#                 sink.clear()
+#             for obj in iterable:
+#                 sink.append(obj)
+#                 yield obj
+#         return IterableMonad(generator())
+#     return iterable_monadic_function
+
+
+# v7
+@higher_order_generator_function
 def tee_to_list(sink: object, append: bool = False) -> _Callable:
 
-    def iterable_monadic_function(iterable: _Iterable) -> _Iterable[object]:
+    def generator(iterable: _Iterable) -> _Iterable[object]:
+        if not append:
+            sink.clear()
+        for obj in iterable:
+            sink.append(obj)
+            yield obj
 
-        def generator():
-            if not append:
-                sink.clear()
-            for obj in iterable:
-                sink.append(obj)
-                yield obj
-
-        return IterableMonad(generator())
-
-    return iterable_monadic_function
+    return generator
 
 
 register_tee(lambda sink: isinstance(sink, _Sequence), tee_to_list)
@@ -177,22 +203,32 @@ register_tee(lambda sink: isinstance(sink, _Sequence), tee_to_list)
 ################################################################################
 #  Tee for set
 
+# v6
+# @higher_order_iterable_monadic_function
+# def tee_to_set(sink: object, append: bool = False) -> _Callable:
+#     def iterable_monadic_function(iterable: _Iterable) -> _Iterable[object]:
+#         def generator():
+#             if not append:
+#                 sink.clear()
+#             for obj in iterable:
+#                 sink.add(obj)
+#                 yield obj
+#         return IterableMonad(generator())
+#     return iterable_monadic_function
 
-@higher_order_iterable_monadic_function
+
+# v7
+@higher_order_generator_function
 def tee_to_set(sink: object, append: bool = False) -> _Callable:
 
-    def iterable_monadic_function(iterable: _Iterable) -> _Iterable[object]:
+    def generator(iterable: _Iterable) -> _Iterable[object]:
+        if not append:
+            sink.clear()
+        for obj in iterable:
+            sink.append(obj)
+            yield obj
 
-        def generator():
-            if not append:
-                sink.clear()
-            for obj in iterable:
-                sink.add(obj)
-                yield obj
-
-        return IterableMonad(generator())
-
-    return iterable_monadic_function
+    return generator
 
 
 register_tee(lambda sink: isinstance(sink, _Set), tee_to_set)
