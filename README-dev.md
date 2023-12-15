@@ -2,6 +2,8 @@
 
 
 
+[Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
+
 
 
 ## Getting Started
@@ -12,6 +14,7 @@
 
 ```sh
 $ pip3 install --upgrade pip wheel
+$ python3 -m pip install --upgrade build
 ```
 
 
@@ -20,7 +23,7 @@ $ pip3 install --upgrade pip wheel
 
 ```sh
 $ git clone git@github.com:MountainField/dw.git
-$ cd mvi-validator
+$ cd dw
 $ pip3 install -e '.[dev]'
 ```
 
