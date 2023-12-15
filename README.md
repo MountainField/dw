@@ -28,8 +28,8 @@
 
 ## Setup
 
-```console
-$ pip install python-dw
+```sh
+pip install python-dw
 ```
 
 
