@@ -1,7 +1,6 @@
 
 # Data Wrangler (dw)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
-
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) ![Python](https://img.shields.io/badge/python-3.6-blue.svg) ![Python](https://img.shields.io/badge/python-3.7-blue.svg) ![Python](https://img.shields.io/badge/python-3.8-blue.svg) ![Python](https://img.shields.io/badge/python-3.9-blue.svg) ![Python](https://img.shields.io/badge/python-3.10-blue.svg) ![Python](https://img.shields.io/badge/python-3.11-blue.svg) ![Python](https://img.shields.io/badge/python-3.12-blue.svg)
 
 
 [dw](https://github.com/MountainField/dw) is a data wrangling tool for command-line interface user.
