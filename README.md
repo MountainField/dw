@@ -28,8 +28,9 @@
 ## Setup
 
 ```bash
-pip install git+https://github.com/MountainField/dw
+$ pip install python-dw
 ```
+
 
 Author
 ------

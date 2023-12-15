@@ -62,9 +62,32 @@ $ rm -rf dist && python3 -m build
 
 ## PyPI
 
+see https://pypi.org/project/python-dw/
+
 ```sh
 $ python3 -m pip install --upgrade twine
 $ python3 -m twine upload --repository pypi dist/*
+```
+
+
+
+## Github Release
+
+```sh
+# brew install gh
+```
+
+```sh
+$ gh auth login
+```
+
+
+
+```sh
+$ V=0.13.3
+# V="$(cat setup.cfg | grep version | cut -d ' ' -f 3)"
+$ gh release create ${V} --generate-notes --prerelease
+$ gh release upload ${V} dist/*
 ```
 
 
