@@ -1,4 +1,8 @@
+
 # Data Wrangler (dw)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+
+
 
 [dw](https://github.com/MountainField/dw) is a data wrangling tool for command-line interface user.
 
