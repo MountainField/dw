@@ -2,7 +2,12 @@
 
 
 
-[Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
+- docs
+    - [Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
+    - [hamcrest/PyHamcrest: Hamcrest matchers for Python](https://github.com/hamcrest/PyHamcrest) 
+    - [Typing Best Practices](https://typing.readthedocs.io/en/latest/source/best_practices.html)
+
+
 
 
 
