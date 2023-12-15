@@ -3,13 +3,13 @@
 # =================================================================
 # dw
 #
-# Copyright (c) 2022 Takahide Nogayama
+# Copyright (c) 2023 Takahide Nogayama
 #
 # This software is released under the MIT License.
 # http://opensource.org/licenses/mit-license.php
 # =================================================================
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 
 import logging as _logging
 import sys as _sys
