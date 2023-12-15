@@ -25,11 +25,13 @@
     ```
 
 
+
 ## Setup
 
-```bash
+```console
 $ pip install python-dw
 ```
+
 
 
 Author
