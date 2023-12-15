@@ -2,7 +2,12 @@
 
 
 
-[Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
+- docs
+    - [Packaging Python Projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
+    - [hamcrest/PyHamcrest: Hamcrest matchers for Python](https://github.com/hamcrest/PyHamcrest) 
+    - [Typing Best Practices](https://typing.readthedocs.io/en/latest/source/best_practices.html)
+
+
 
 
 
@@ -34,7 +39,7 @@ $ pip3 install -e '.[dev]'
 The test code is written in [RSpec](https://rspec.info) style using [USpec](https://github.com/MountainField/uspec) and [PyHamcrest](https://github.com/hamcrest/PyHamcrest). But to run the tests you just execute `unittest`  that is built in test framework
 
 ```sh
-$ python3 -m unittest discover -v -s src/tests -p '*_spec.py'
+$ python3 -m unittest discover -v -s src -p '*_spec.py'
 ```
 
 

@@ -165,3 +165,4 @@ dev
 tmp_old
 
 .DS_Store
+.python-version
